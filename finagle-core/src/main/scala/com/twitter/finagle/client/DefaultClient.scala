@@ -4,6 +4,7 @@ import com.twitter.conversions.time._
 import com.twitter.finagle._
 import com.twitter.finagle.factory.{RefcountedFactory, StatsFactoryWrapper,   TimeoutFactory}
 import com.twitter.finagle.filter.MonitorFilter
+import com.twitter.finagle.loadbalancer.{LoadBalancerFactory, HeapBalancerFactory}
 import com.twitter.finagle.loadbalancer.HeapBalancer
 import com.twitter.finagle.service.FailureAccrualFactory
 import com.twitter.finagle.service.{
@@ -71,7 +72,8 @@ case class DefaultClient[Req, Rep](
   statsReceiver: StatsReceiver = ClientStatsReceiver,
   hostStatsReceiver: StatsReceiver = NullStatsReceiver,
   tracer: Tracer  = DefaultTracer,
-  monitor: Monitor = DefaultMonitor
+  monitor: Monitor = DefaultMonitor,
+  loadBalancer: LoadBalancerFactory = HeapBalancerFactory
 ) extends Client[Req, Rep] {
   com.twitter.finagle.Init()
 
@@ -153,7 +155,7 @@ case class DefaultClient[Req, Rep](
   
     val balanced: Group[SocketAddress] => ServiceFactory[Req, Rep] = group => {
       val endpoints = group map { addr => (addr, bindStack(addr)) }
-      new HeapBalancer(
+      loadBalancer(
         endpoints,
         statsReceiver.scope("loadbalancer"),
         hostStatsReceiver.scopeSuffix("loadbalancer"),

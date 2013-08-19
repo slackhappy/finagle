@@ -9,6 +9,15 @@ import com.twitter.util._
 import java.net.{InetSocketAddress, SocketAddress}
 import util.Random
 
+object HeapBalancerFactory extends LoadBalancerFactory {
+  def apply[Req, Rep](
+      group: Group[(SocketAddress, ServiceFactory[Req, Rep])],
+      globalStatsReceiver: StatsReceiver,
+      statsReceiver: StatsReceiver,
+      emptyException: NoBrokersAvailableException) =
+    new HeapBalancer[Req,Rep](group, globalStatsReceiver, statsReceiver, emptyException)
+}
+
 /**
  * An efficient load balancer that operates on Groups.
  */
