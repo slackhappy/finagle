@@ -18,7 +18,7 @@ object Finagle extends Build {
   def util(which: String) = "com.twitter" %% ("util-"+which) % utilVersion
 
   val sharedSettings = Seq(
-    version := "6.3.0_fs-a",
+    version := "6.3.1_fs-a",
     organization := "com.twitter",
     crossScalaVersions := Seq("2.9.2", "2.10.0"),
     libraryDependencies ++= Seq(
